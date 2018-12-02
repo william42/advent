@@ -44,7 +44,7 @@ fn day1b() -> i32 {
             total = total + freq;
         }
     }
-    42 //shouldn't happen
+    panic!("unreachable code")
 }
 
 
@@ -83,5 +83,5 @@ fn day2b() -> String {
             seen.insert(common);
         }
     }
-    String::new() //shouldn't happen
+    panic!("should be unreachable")
 }
