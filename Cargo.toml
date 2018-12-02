@@ -1,0 +1,6 @@
+[package]
+name = "advent"
+version = "0.1.0"
+authors = ["Will A Cadegan-Schlieper <wacs@covering.space>"]
+
+[dependencies]
