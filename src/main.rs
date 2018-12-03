@@ -44,7 +44,6 @@ fn day1b() -> i32 {
             total = total + freq;
         }
     }
-    panic!("unreachable code")
 }
 
 
