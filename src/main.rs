@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::collections::HashMap;
 
 fn main() {
-    println!("{}", day2b());
+    println!("{}", day3b());
 }
 
 fn adventlines(loc: &str) -> impl Iterator<Item = String> {
@@ -84,4 +84,89 @@ fn day2b() -> String {
         }
     }
     panic!("should be unreachable")
+}
+
+struct CRect {
+    num: u32,
+    left: u32,
+    top: u32,
+    width: u32,
+    height: u32,
+}
+
+fn day3line(line: String) -> CRect {
+    let line = &line[1..]; //omit initial #
+    let mut it = line.splitn(2, " @ ");
+    let raw_num = it.next().unwrap();
+    let rest = it.next().unwrap();
+    let mut it = rest.splitn(2, ",");
+    let raw_left = it.next().unwrap();
+    let rest = it.next().unwrap();
+    let mut it = rest.splitn(2, ": ");
+    let raw_top = it.next().unwrap();
+    let rest = it.next().unwrap();
+    let mut it = rest.splitn(2, "x");
+    let raw_width = it.next().unwrap();
+    let raw_height = it.next().unwrap();
+    CRect {
+        num: raw_num.parse().unwrap(),
+        left: raw_left.parse().unwrap(),
+        top: raw_top.parse().unwrap(),
+        width: raw_width.parse().unwrap(),
+        height: raw_height.parse().unwrap(),
+    }
+}
+
+fn day3a() -> i32 {
+    let lines = adventlines("input3.txt");
+    let lines = lines.map(day3line);
+    // let right = lines.iter().map(|x| x.left + x.width).max().unwrap();
+    // let bottom = lines.iter().map(|x| x.top + x.height).max().unwrap();
+    // println!("{} wide and {} tall", right, bottom);
+    let mut fabric: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
+    for x in lines {
+        for i in x.left..x.left+x.width {
+            for j in x.top..x.top+x.height {
+                fabric[i as usize][j as usize] += 1;
+            }
+        }
+    }
+    // wanted to do this functionally but hit weird type barriers
+    let mut res = 0;
+    for line in fabric.iter() {
+        for x in line.iter() {
+            if x >= &2 {
+                res += 1;
+            }
+        }
+    }
+    res
+}
+
+fn day3b() -> u32 {
+    let lines = adventlines("input3.txt").map(day3line);
+    let mut fabric: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
+    for x in lines {
+        for i in x.left..x.left+x.width {
+            for j in x.top..x.top+x.height {
+                fabric[i as usize][j as usize] += 1;
+            }
+        }
+    }
+
+    let lines = adventlines("input3.txt").map(day3line); // i could fix the borrow issue, or i could just read the file twice
+    for x in lines {
+        let mut good = true;
+        for i in x.left..x.left+x.width {
+            for j in x.top..x.top+x.height {
+                if fabric[i as usize][j as usize] > 1 {
+                    good = false;
+                }
+            }
+        }
+        if good {
+            return x.num;
+        }
+    }
+    panic!("this should never happen")
 }
