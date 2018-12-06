@@ -1,9 +1,9 @@
-use std::fs::File;
-use std::io::BufReader;
-use std::io::BufRead;
-use std::io::Read;
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::io::Read;
 
 fn main() {
     println!("{}", day5b());
@@ -31,12 +31,12 @@ fn day1a() -> i32 {
 }
 
 fn day1b() -> i32 {
-    let mut total :i32 = 0;
+    let mut total: i32 = 0;
     let mut seen = HashSet::new();
     loop {
         let lines = adventlines("input1a.txt");
         let frequencies = lines.map(process_frequency);
-        
+
         for freq in frequencies {
             if seen.contains(&total) {
                 return total;
@@ -47,21 +47,20 @@ fn day1b() -> i32 {
     }
 }
 
-
 fn day2a() -> i32 {
-    let lines= adventlines("input2.txt");
+    let lines = adventlines("input2.txt");
     let mut twos = 0;
     let mut threes = 0;
     for line in lines {
-        let mut counts : HashMap<char, u32> = HashMap::new();
+        let mut counts: HashMap<char, u32> = HashMap::new();
         for l in line.chars() {
             let counter = counts.entry(l).or_insert(0);
             *counter += 1;
         }
-        if counts.values().any(|&x| x==2) {
+        if counts.values().any(|&x| x == 2) {
             twos += 1;
         }
-        if counts.values().any(|&x| x==3) {
+        if counts.values().any(|&x| x == 3) {
             threes += 1;
         }
     }
@@ -69,14 +68,14 @@ fn day2a() -> i32 {
 }
 
 fn day2b() -> String {
-    let lines : Vec<String> = adventlines("input2.txt").collect();
+    let lines: Vec<String> = adventlines("input2.txt").collect();
     let len = lines[0].len();
     for i in 0..len {
         let mut seen = HashSet::new();
         for line in &lines {
             let mut common = String::with_capacity(len);
             common.push_str(&line[..i]);
-            common.push_str(&line[i+1..]);
+            common.push_str(&line[i + 1..]);
             if seen.contains(&common) {
                 return common;
             }
@@ -125,8 +124,8 @@ fn day3a() -> i32 {
     // println!("{} wide and {} tall", right, bottom);
     let mut fabric: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
     for x in lines {
-        for i in x.left..x.left+x.width {
-            for j in x.top..x.top+x.height {
+        for i in x.left..x.left + x.width {
+            for j in x.top..x.top + x.height {
                 fabric[i as usize][j as usize] += 1;
             }
         }
@@ -147,8 +146,8 @@ fn day3b() -> u32 {
     let lines = adventlines("input3.txt").map(day3line);
     let mut fabric: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
     for x in lines {
-        for i in x.left..x.left+x.width {
-            for j in x.top..x.top+x.height {
+        for i in x.left..x.left + x.width {
+            for j in x.top..x.top + x.height {
                 fabric[i as usize][j as usize] += 1;
             }
         }
@@ -157,8 +156,8 @@ fn day3b() -> u32 {
     let lines = adventlines("input3.txt").map(day3line); // i could fix the borrow issue, or i could just read the file twice
     for x in lines {
         let mut good = true;
-        for i in x.left..x.left+x.width {
-            for j in x.top..x.top+x.height {
+        for i in x.left..x.left + x.width {
+            for j in x.top..x.top + x.height {
                 if fabric[i as usize][j as usize] > 1 {
                     good = false;
                 }
@@ -171,8 +170,10 @@ fn day3b() -> u32 {
     panic!("this should never happen")
 }
 
-fn polymer<I>(r: &mut I, prev: Option<u8>) -> Option<u32> 
-where I: Iterator<Item = Result<u8,std::io::Error>> {
+fn polymer<I>(r: &mut I, prev: Option<u8>) -> Option<u32>
+where
+    I: Iterator<Item = Result<u8, std::io::Error>>,
+{
     loop {
         let curr = match r.next() {
             None => return Some(0),
@@ -186,7 +187,7 @@ where I: Iterator<Item = Result<u8,std::io::Error>> {
             }
         }
         if let Some(result) = polymer(r, Some(curr)) {
-            return Some(result+1);
+            return Some(result + 1);
         }
     }
 }
@@ -195,7 +196,7 @@ fn day5a() -> u32 {
     let file = File::open("input5.txt");
     let reader = BufReader::new(file.unwrap());
     let mut r = reader.bytes();
-    if let Some(x) = polymer(&mut r,None) {
+    if let Some(x) = polymer(&mut r, None) {
         x
     } else {
         panic!("can't happen")
@@ -212,7 +213,7 @@ fn poly_without(i: u8) -> u32 {
             panic!("ugh ugh")
         }
     });
-    if let Some(x) = polymer(&mut r,None) {
+    if let Some(x) = polymer(&mut r, None) {
         x
     } else {
         panic!("can't happen")
