@@ -1,11 +1,12 @@
 use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;
+use std::io::Read;
 use std::collections::HashSet;
 use std::collections::HashMap;
 
 fn main() {
-    println!("{}", day3b());
+    println!("{}", day5b());
 }
 
 fn adventlines(loc: &str) -> impl Iterator<Item = String> {
@@ -168,4 +169,60 @@ fn day3b() -> u32 {
         }
     }
     panic!("this should never happen")
+}
+
+fn polymer<I>(r: &mut I, prev: Option<u8>) -> Option<u32> 
+where I: Iterator<Item = Result<u8,std::io::Error>> {
+    loop {
+        let curr = match r.next() {
+            None => return Some(0),
+            Some(Err(_)) => panic!("oh fuck"),
+            Some(Ok(10)) => return Some(0),
+            Some(Ok(x)) => x,
+        };
+        if let Some(prev) = prev {
+            if (curr == prev + 32) || (curr == prev - 32) {
+                return None;
+            }
+        }
+        if let Some(result) = polymer(r, Some(curr)) {
+            return Some(result+1);
+        }
+    }
+}
+
+fn day5a() -> u32 {
+    let file = File::open("input5.txt");
+    let reader = BufReader::new(file.unwrap());
+    let mut r = reader.bytes();
+    if let Some(x) = polymer(&mut r,None) {
+        x
+    } else {
+        panic!("can't happen")
+    }
+}
+
+fn poly_without(i: u8) -> u32 {
+    let file = File::open("input5.txt");
+    let reader = BufReader::new(file.unwrap());
+    let mut r = reader.bytes().filter(|b| {
+        if let Ok(b) = b {
+            (*b != i + 64) && (*b != i + 96)
+        } else {
+            panic!("ugh ugh")
+        }
+    });
+    if let Some(x) = polymer(&mut r,None) {
+        x
+    } else {
+        panic!("can't happen")
+    }
+}
+
+fn day5b() -> u32 {
+    if let Some(x) = (1..27).map(poly_without).min() {
+        x
+    } else {
+        panic!("can't happen")
+    }
 }
