@@ -6,7 +6,7 @@ use std::io::BufReader;
 use std::io::Read;
 
 fn main() {
-    println!("{}", day5b());
+    println!("{}", day8b());
 }
 
 fn adventlines(loc: &str) -> impl Iterator<Item = String> {
@@ -226,4 +226,48 @@ fn day5b() -> u32 {
     } else {
         panic!("can't happen")
     }
+}
+
+fn tree<I,F>(r: &mut I, cb: &F) -> u32
+where
+    I: Iterator<Item=u32>,
+    F: Fn(Vec<u32>,Vec<u32>) -> u32
+{
+    let children_count = r.next().unwrap();
+    let metadata_count = r.next().unwrap();
+    let mut children = Vec::new();
+    for _ in 0..children_count {
+        children.push(tree(r, cb));
+    }
+    let mut metadata = Vec::new();
+    for _ in 0..metadata_count {
+        metadata.push(r.next().unwrap());
+    }
+    cb(children, metadata)
+}
+
+fn day8a() -> u32 {
+    let data = adventlines("input8.txt").next().unwrap();
+    let mut numbers = data.split(' ').map(|x| x.parse::<u32>().unwrap());
+    tree(&mut numbers, &|c: Vec<u32>,m: Vec<u32>| c.iter().sum::<u32>() + m.iter().sum::<u32>())
+}
+
+fn day8b() -> u32 {
+    fn process_tree(children: Vec<u32>, metadata: Vec<u32>) -> u32 {
+        if children.is_empty() {
+            metadata.iter().sum::<u32>()
+        } else {
+            metadata.iter().map(|&j| {
+                let i = j as usize;
+                if i <= 0 || i > children.len() {
+                    0
+                } else {
+                    children[i - 1]
+                }
+            }).sum::<u32>()
+        }
+    }
+    let data = adventlines("input8.txt").next().unwrap();
+    let mut numbers = data.split(' ').map(|x| x.parse::<u32>().unwrap());
+    tree(&mut numbers, &process_tree)
 }
